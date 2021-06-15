@@ -6,35 +6,17 @@ terraform {
   }
 }
 
-variable "minecraft_server_url" {
-    default = "https://launcher.mojang.com/v1/objects/0a269b5f2c5b93b1712d0f5dc43b6182b9ab254e/server.jar"
-}
-
-variable "java16_package"{
-    default = "jdk-16.0.1.aarch64"
-}
-
-data oci_identity_availability_domain JWHn-US-ASHBURN-AD-1 {
+data "oci_identity_availability_domain" "JWHn-US-ASHBURN-AD-1" {
   compartment_id = var.compartment_ocid
   ad_number      = "1"
 }
 
-variable minecraft_server_test_vm_source_image_id { 
-  default = "ocid1.image.oc1.iad.aaaaaaaaijzevirp67bdceiebqeg4epuqstqcogohn3gskw76ngxupke3zfa" 
-}
-
-provider "oci" {
-  region              = var.region
-  auth                = "SecurityToken"
-  config_file_profile = "DEFAULT"
-}
-
-resource oci_core_instance minecraft_server_test_vm {
+resource "oci_core_instance" "minecraft_server_test_vm" {
   availability_domain = data.oci_identity_availability_domain.JWHn-US-ASHBURN-AD-1.name
-  compartment_id = var.compartment_ocid
+  compartment_id      = var.compartment_ocid
   create_vnic_details {
     assign_public_ip = "true"
-    display_name = "minecraft_server_test_vm"
+    display_name     = "minecraft_server_test_vm"
     freeform_tags = {
     }
 
@@ -74,14 +56,14 @@ resource oci_core_instance minecraft_server_test_vm {
   }
 
   connection {
-    type     = "ssh"
-    user     = "opc"
-    host     = "${self.public_ip}"
-    agent       = true
-    }
+    type  = "ssh"
+    user  = "opc"
+    host  = self.public_ip
+    agent = true
+  }
 
-provisioner "remote-exec" {
-  inline = [
+  provisioner "remote-exec" {
+    inline = [
       "sudo yum install -y ${var.java16_package}",
       "sudo mkdir /usr/local/mc_server",
       "sudo chmod 777 /usr/local/mc_server",
@@ -93,24 +75,24 @@ provisioner "remote-exec" {
       "java -Xmx1024M -Xms1024M -jar /usr/local/mc_server/server.jar nogui",
       "sed -i -e 's/false/true/' eula.txt",
       "sleep 30",
-      "java -Xmx1024M -Xms1024M -jar /usr/local/mc_server/server.jar nogui",  
+      "java -Xmx1024M -Xms1024M -jar /usr/local/mc_server/server.jar nogui",
     ]
   }
   state = "RUNNING"
 }
 
-resource oci_core_internet_gateway Internet-Gateway-main_vcn {
+resource "oci_core_internet_gateway" "Internet-Gateway-main_vcn" {
   compartment_id = var.compartment_ocid
-  display_name = "Internet Gateway main_vcn"
-  enabled      = "true"
+  display_name   = "Internet Gateway main_vcn"
+  enabled        = "true"
   freeform_tags = {
   }
   vcn_id = oci_core_vcn.main_vcn.id
 }
 
-resource oci_core_subnet main_subnet {
-  cidr_block     = "10.0.0.0/24"
-  compartment_id = var.compartment_ocid
+resource "oci_core_subnet" "main_subnet" {
+  cidr_block      = "10.0.0.0/24"
+  compartment_id  = var.compartment_ocid
   dhcp_options_id = oci_core_vcn.main_vcn.default_dhcp_options_id
   display_name    = "main_subnet"
   freeform_tags = {
@@ -124,19 +106,19 @@ resource oci_core_subnet main_subnet {
   vcn_id = oci_core_vcn.main_vcn.id
 }
 
-resource oci_core_vcn main_vcn {
+resource "oci_core_vcn" "main_vcn" {
   cidr_blocks = [
     "10.0.0.0/16",
   ]
   compartment_id = var.compartment_ocid
-  display_name = "main_vcn"
+  display_name   = "main_vcn"
   freeform_tags = {
   }
 }
 
-resource oci_core_default_dhcp_options Default-DHCP-Options-for-main_vcn {
+resource "oci_core_default_dhcp_options" "Default-DHCP-Options-for-main_vcn" {
   compartment_id = var.compartment_ocid
-  display_name = "Default DHCP Options for main_vcn"
+  display_name   = "Default DHCP Options for main_vcn"
   freeform_tags = {
   }
   manage_default_resource_id = oci_core_vcn.main_vcn.default_dhcp_options_id
@@ -148,9 +130,9 @@ resource oci_core_default_dhcp_options Default-DHCP-Options-for-main_vcn {
   }
 }
 
-resource oci_core_default_route_table Default-Route-Table-for-main_vcn {
+resource "oci_core_default_route_table" "Default-Route-Table-for-main_vcn" {
   compartment_id = var.compartment_ocid
-  display_name = "Default Route Table for main_vcn"
+  display_name   = "Default Route Table for main_vcn"
   freeform_tags = {
   }
   manage_default_resource_id = oci_core_vcn.main_vcn.default_route_table_id
@@ -161,14 +143,14 @@ resource oci_core_default_route_table Default-Route-Table-for-main_vcn {
   }
 }
 
-resource oci_core_default_security_list Default-Security-List-for-main_vcn {
+resource "oci_core_default_security_list" "Default-Security-List-for-main_vcn" {
   compartment_id = var.compartment_ocid
-  display_name = "Default Security List for main_vcn"
+  display_name   = "Default Security List for main_vcn"
   egress_security_rules {
     destination      = "0.0.0.0/0"
     destination_type = "CIDR_BLOCK"
-    protocol  = "all"
-    stateless = "false"
+    protocol         = "all"
+    stateless        = "false"
   }
   freeform_tags = {
   }
