@@ -10,7 +10,7 @@ This project is based on Todd Sharp's tutorial [How To Set Up and Run a (Really 
 * Install [Terraform](https://terraform.io/) with a package manager or by downlading the binary. 
 *  Follow the directions in [How To Set Up and Run a (Really Powerful) Free Minecraft Server in the Cloud](https://blogs.oracle.com/developers/) to set up your Oracle Cloud tenancy.
 *  Generate [an API signing key.](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm#two)
-* Generate (an ssh key pair)[https://www.oracle.com/webfolder/technetwork/tutorials/obe/cloud/compute-iaas/generating_ssh_key/generate_ssh_key.html]. You will populate your public key in the `TF_VAR_ssh_authorized_keys` variable.
+* Generate [an ssh key pair](https://www.oracle.com/webfolder/technetwork/tutorials/obe/cloud/compute-iaas/generating_ssh_key/generate_ssh_key.html).  You will populate your public key in the `TF_VAR_ssh_authorized_keys` variable.
 
 ## Usage
 * You will need a `.tfvars` file with the the following values:
