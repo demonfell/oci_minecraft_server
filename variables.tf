@@ -3,7 +3,7 @@ variable "minecraft_server_url" {
 }
 
 variable "java16_package" {
-  default = "jdk-16.0.1.aarch64"
+  default = "jdk-16.0.1.0.1.aarch64"
 }
 
 variable "minecraft_server_test_vm_source_image_id" {
@@ -11,6 +11,10 @@ variable "minecraft_server_test_vm_source_image_id" {
 }
 
 variable "compartment_ocid" {}
-variable "private_key_file" {}
+variable "private_key_path" {}
 variable "region" {}
 variable "ssh_authorized_keys" {}
+variable "user_ocid" {}
+variable "fingerprint" {}
+variable "tenancy_ocid" {}
+variable "private_key_password" {}
