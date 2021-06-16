@@ -26,9 +26,9 @@ export TF_VAR_region="us-ashburn-1"
 ```
 Source variables with `source .tfvars`
 * Deploy
-** `terraform init`
-** `terraform plan`
-** `terraform apply`
+  * `terraform init`
+  * `terraform plan`
+  * `terraform apply`
 
 ## Known issues
 * Region in my example is Ashburn, and if you choose a different region, you will need to change `data "oci_identity_availability_domain"` in `main.tf`.

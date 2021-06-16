@@ -8,7 +8,7 @@ terraform {
 
 data "oci_identity_availability_domain" "JWHn-US-ASHBURN-AD-1" {
   compartment_id = var.compartment_ocid
-  ad_number      = "1"
+  ad_number      = "2"
 }
 
 resource "oci_core_instance" "minecraft_server_test_vm" {
@@ -74,7 +74,7 @@ resource "oci_core_instance" "minecraft_server_test_vm" {
       "java -Xmx1024M -Xms1024M -jar /usr/local/mc_server/server.jar nogui",
       "sed -i -e 's/false/true/' eula.txt",
       "sleep 30",
-      "java -Xmx1024M -Xms1024M -jar /usr/local/mc_server/server.jar nogui",
+      "nohup java -Xmx1024M -Xms1024M -jar /usr/local/mc_server/server.jar nogui &",
     ]
   }
   state = "RUNNING"
