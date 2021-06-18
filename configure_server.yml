@@ -1,0 +1,102 @@
+---
+- name: Install and configure a Minecraft 1.17 Server  
+  hosts: localhost
+  tasks:
+    - name: install needed packages
+      ansible.builtin.yum:
+        name:
+          - screen
+          - '{{ JAVA16_PACKAGE }}'
+        state: present
+    
+    - name: Ensure group minecraft exists
+      ansible.builtin.group:
+        name: minecraft
+        state: present
+    
+    - name: Add the user minecraft with a primary group of 'minecraft'
+      ansible.builtin.user:
+        name: minecraft
+        comment: Minecraft service account
+        group: minecraft
+    
+    - name:  Create the destination directory for server and related files
+      ansible.builtin.file:
+        path:  /opt/minecraft/oci/
+        state: directory
+        group: minecraft
+        owner: minecraft
+        mode: '0777'
+        recurse: yes
+    
+    - name: Download the Minecraft server jar
+      get_url:
+        url: '{{ MINECRAFT_SERVER_URL }}'
+        dest: /opt/minecraft/oci/
+        mode: '0777'
+    
+    - name: open needed ports on host-based firewall
+      firewalld:
+        permanent: yes
+        state: enabled
+        port: '{{ item }}'
+      loop:
+        - '25565/tcp'
+        - '25565/udp'
+    
+    - name: Initial server run
+      shell: "/usr/bin/java -Xmx1024M -Xms1024M -jar server.jar nogui"
+      args: 
+        chdir: /opt/minecraft/oci/
+    
+    - name: Touch the server config file
+      ansible.builtin.file:
+        path: /opt/minecraft/oci/server.conf
+        state: touch
+    
+    - name: change the eula file
+      lineinfile:
+        path: eula.txt
+        regexp: "eula=false" 
+        line: "eula=true"
+        state: present
+    
+    - name: Copy files to destination directory
+      ansible.builtin.copy:
+        src:  '{{ item }}'
+        dest: '/opt/minecraft/oci/'
+        owner: minecraft
+        group: minecraft
+        mode: '0777'
+      loop: 
+        - 'banned-ips.json' 
+        - 'banned-players.json'
+        - 'eula.txt' 
+        - 'ops.json' 
+        - 'server.properties' 
+        - 'usercache.json'
+        - 'whitelist.json' 
+        - 'world/' 
+        - 'logs/' 
+
+    - name: Remove copied files
+      ansible.builtin.file:
+        path:  '{{ item }}'
+        state: absent
+      loop: 
+        - 'banned-ips.json' 
+        - 'banned-players.json'
+        - 'eula.txt' 
+        - 'ops.json' 
+        - 'server.properties' 
+        - 'usercache.json'
+        - 'whitelist.json' 
+        - 'world/' 
+        - 'logs/' 
+    
+    - name: Enable and start the Minecraft systemd unit
+      ansible.builtin.systemd:
+        name:  minecraft@oci
+        state: started
+        enabled: yes
+        daemon_reload: yes
