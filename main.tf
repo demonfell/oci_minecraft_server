@@ -6,13 +6,13 @@ terraform {
   }
 }
 
-data "oci_identity_availability_domain" "JWHn-US-ASHBURN-AD-1" {
+
+data "oci_identity_availability_domains" "this" {
   compartment_id = var.compartment_ocid
-  ad_number      = "2"
 }
 
 resource "oci_core_instance" "minecraft_server_test_vm" {
-  availability_domain = data.oci_identity_availability_domain.JWHn-US-ASHBURN-AD-1.name
+  availability_domain = "${lookup(data.oci_identity_availability_domains.this.availability_domains[lookup(var.ad_map, var.ad, 0)],"name")}"
   compartment_id      = var.compartment_ocid
   create_vnic_details {
     assign_public_ip = "true"
@@ -62,19 +62,20 @@ resource "oci_core_instance" "minecraft_server_test_vm" {
     agent = true
   }
 
+  provisioner "file" {
+    source      = "./files/configure_server.yml"
+    destination = "configure_server.yml"
+  }
+
+  provisioner "file" {
+    source      = "./files/minecraft@.service"
+    destination = "minecraft@.service"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "sudo yum install -y ${var.java16_package}",
-      "sudo mkdir /usr/local/mc_server",
-      "sudo chmod 777 /usr/local/mc_server",
-      "curl ${var.minecraft_server_url} -o /usr/local/mc_server/server.jar",
-      "sudo firewall-cmd --permanent --zone=public --add-port=25565/tcp",
-      "sudo firewall-cmd --permanent --zone=public --add-port=25565/udp",
-      "sudo firewall-cmd --reload",
-      "java -Xmx1024M -Xms1024M -jar /usr/local/mc_server/server.jar nogui",
-      "sed -i -e 's/false/true/' eula.txt",
-      "sleep 30",
-      "nohup java -Xmx1024M -Xms1024M -jar /usr/local/mc_server/server.jar nogui &",
+      "sudo yum install -y ansible --enablerepo ol7_developer --enablerepo ol7_developer_EPEL --enablerepo ol7_oci_included",
+      "ansible-playbook configure_server.yml -e \"MINECRAFT_SERVER_URL=${var.minecraft_server_url}\" -b",
     ]
   }
   state = "RUNNING"
