@@ -34,14 +34,16 @@
         state: directory
         group: minecraft
         owner: minecraft
-        mode: '2664'
+        mode: '2770'
         recurse: yes
     
     - name: Download the Minecraft server jar
       get_url:
         url: '{{ MINECRAFT_SERVER_URL }}'
         dest: '{{ mc_server_path }}'
-        mode: '0664'
+        mode: '0770'
+      become: yes
+      become_user: minecraft
     
     - name: open needed ports on host-based firewall
       firewalld:
@@ -56,11 +58,15 @@
       shell: '/usr/bin/java -Xmx1024M -Xms1024M -jar server.jar nogui'
       args: 
         chdir: '{{ mc_server_path }}'
+      become: yes
+      become_user: minecraft
     
     - name: Touch the server config file
       ansible.builtin.file:
         path: "{{ mc_server_path }}server.conf"
         state: touch
+      become: yes
+      become_user: minecraft
     
     - name: change the eula file
       lineinfile:
@@ -75,7 +81,7 @@
         dest: '/etc/systemd/system/'
         owner: minecraft
         group: minecraft
-        mode: '0644'
+        mode: '0770'
 
     - name: Enable and start the Minecraft systemd unit
       ansible.builtin.systemd:
