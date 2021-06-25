@@ -1,6 +1,6 @@
-# Create a Minecraft 1.17 Server in Oracle Cloud with Terraform
+# Create a Minecraft 1.17 Server in Oracle Cloud with Terraform and Ansible
 
-This project is based on Todd Sharp's tutorial [How To Set Up and Run a (Really Powerful) Free Minecraft Server in the Cloud](https://blogs.oracle.com/developers/how-to-set-up-and-run-a-really-powerful-free-minecraft-server-in-the-cloud/comment-submitted?cid=25c4a526-1684-47e2-baf4-db7e9a9f1b40). I generated [Terraform](https://recursive.codes/blog/post/1794) to create the VM and then used the [Remote Exec Provisioner](https://www.terraform.io/docs/language/resources/provisioners/remote-exec.html) to do a zero touch deployment of the Minecraft server.
+This project is based on Todd Sharp's tutorial [How To Set Up and Run a (Really Powerful) Free Minecraft Server in the Cloud](https://blogs.oracle.com/developers/how-to-set-up-and-run-a-really-powerful-free-minecraft-server-in-the-cloud/comment-submitted?cid=25c4a526-1684-47e2-baf4-db7e9a9f1b40). I generated [Terraform](https://recursive.codes/blog/post/1794) to create the VM and VCN and configured the [Remote Exec Provisioner](https://www.terraform.io/docs/language/resources/provisioners/remote-exec.html) to upload files and run an Ansible playbook to perform a zero-touch deployment of the Minecraft server.
 
 ## Server specs (Always-Free Tier Eligible)
 - VM.Standard.A1.Flex (Ampere Arm-based processor)
@@ -21,8 +21,9 @@ export TF_VAR_user_ocid="ocid1.user.oc1..a"
 export TF_VAR_fingerprint=""
 export TF_VAR_private_key_path=""
 export TF_VAR_private_key_password=""
-export TF_VAR_ssh_authorized_keys=""
+export TF_VAR_ssh_authorized_keys=`cat ~/.ssh/oci_key.pub`
 export TF_VAR_region="us-ashburn-1"
+export TF_VAR_ad"="ad1"
 ```
 Source variables with `source .tfvars`
 * Deploy
@@ -30,9 +31,8 @@ Source variables with `source .tfvars`
   * `terraform plan`
   * `terraform apply`
 
-## Known issues
-* Region in my example is Ashburn, and if you choose a different region, you will need to change `data "oci_identity_availability_domain"` in `main.tf`.
-* Since server starts running at the end of deployment, you will need to press Control-C to exit the terraform apply and it will show failed.
+## Note
+* The OCI regions us-phoenix-1, us-ashburn-1, eu-frankfurt-1, and uk-london-1 have 3 Availability Domains. Selection of availability domain in `oci_core_instance` -> `minecraft_server_test_vm` -> `availability_domain` will default to 0 for AD1 but if you need to override this setting in a multi-AD region, you can do so with the `ad` variable in your `.tfvars` file.
 
 # Contact
 Author: James Pemantell<br>
