@@ -31,8 +31,8 @@ Source variables with `source .tfvars`
   * `terraform plan`
   * `terraform apply`
 
-* Connect to the console with tmux
-I implmemented [minecraft-tmux-service](https://github.com/moonlight200/minecraft-tmux-service/) by [moonlight200](https://github.com/moonlight200) so that the server starts with a systemd unit on system boot and runs in a `tmux` session. You can connect to the console with: 
+* Connect to the console with tmux<br>
+I implemented [minecraft-tmux-service](https://github.com/moonlight200/minecraft-tmux-service/) by [moonlight200](https://github.com/moonlight200) so that the server starts with a systemd unit on system boot and runs in a `tmux` session. You can connect to the console with: 
 ```
 sudo su - minecraft /opt/minecraft/oci/service.sh attach
 ```
