@@ -68,8 +68,13 @@ resource "oci_core_instance" "minecraft_server_test_vm" {
   }
 
   provisioner "file" {
-    source      = "./files/minecraft@.service"
-    destination = "minecraft@.service"
+    source      = "./files/minecraft.service"
+    destination = "minecraft.service"
+  }
+
+    provisioner "file" {
+    source      = "./files/service.sh"
+    destination = "service.sh"
   }
 
   provisioner "remote-exec" {

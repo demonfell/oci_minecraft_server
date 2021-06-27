@@ -1,0 +1,27 @@
+[Unit]
+Description=Minecraft Server
+
+Wants=network.target
+After=network.target
+
+[Service]
+Type=forking
+User=minecraft
+Group=minecraft
+Nice=5
+TimeoutStopSec=90
+
+ProtectHome=read-only
+ProtectSystem=full
+PrivateDevices=no
+NoNewPrivileges=yes
+PrivateTmp=no
+
+WorkingDirectory=/opt/minecraft/oci
+# PIDFile=/opt/minecraft/oci/minecraft-server.pid
+ExecStart=/opt/minecraft/oci/service.sh start
+ExecReload=/opt/minecraft/oci/service.sh reload
+ExecStop=/opt/minecraft/oci/service.sh stop
+
+[Install]
+WantedBy=multi-user.target

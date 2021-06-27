@@ -7,7 +7,7 @@
     - name: install needed packages
       ansible.builtin.yum:
         name:
-          - screen
+          - tmux
           - jdk-16*.aarch64
         state: present
     
@@ -21,6 +21,7 @@
         name: minecraft
         comment: Minecraft service account
         group: minecraft
+        home: '{{ mc_server_path }}'
 
     - name: Add the user 'opc' to the group 'minecraft'
       ansible.builtin.user:
@@ -74,18 +75,26 @@
         regexp: 'eula=false'
         line: 'eula=true'
         state: present
-    
-    - name: Copy systemd unit to destination directory
+
+- name: Copy service script file to destination directory
       ansible.builtin.copy:
-        src:  'minecraft@.service'
-        dest: '/etc/systemd/system/'
+        src:  'minecraft.service'
+        dest: '{{ mc_server_path }}'
         owner: minecraft
         group: minecraft
         mode: '0770'
+    
+    - name: Copy systemd unit to destination directory
+      ansible.builtin.copy:
+        src:  'minecraft.service'
+        dest: '/etc/systemd/system/'
+        owner: minecraft
+        group: minecraft
+        mode: '0660'
 
     - name: Enable and start the Minecraft systemd unit
       ansible.builtin.systemd:
-        name:  minecraft@oci
+        name:  minecraft
         state: started
         enabled: yes
         daemon_reload: yes
