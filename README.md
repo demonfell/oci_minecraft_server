@@ -40,7 +40,7 @@ sudo su - minecraft /opt/minecraft/oci/service.sh attach
 ## Note
 * The OCI regions us-phoenix-1, us-ashburn-1, eu-frankfurt-1, and uk-london-1 have 3 Availability Domains. Selection of availability domain in `oci_core_instance` -> `minecraft_server_test_vm` -> `availability_domain` will default to 0 for AD1 but if you need to override this setting in a multi-AD region, you can do so with the `ad` variable in your `.tfvars` file.
 
-# License
+## License
 Copyright (C) 2021 James Pemantell
 
 This program is free software: you can redistribute it and/or modify
@@ -56,7 +56,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Contact
+## Contact
 Author: James Pemantell<br>
 Email: pbin2au@gmail.com<br>
 
