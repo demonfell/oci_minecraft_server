@@ -31,8 +31,30 @@ Source variables with `source .tfvars`
   * `terraform plan`
   * `terraform apply`
 
+* Connect to the console with tmux
+I implmemented [minecraft-tmux-service](https://github.com/moonlight200/minecraft-tmux-service/) by [moonlight200](https://github.com/moonlight200) so that the server starts with a systemd unit on system boot and runs in a `tmux` session. You can connect to the console with: 
+```
+sudo su - minecraft /opt/minecraft/oci/service.sh attach
+```
+
 ## Note
 * The OCI regions us-phoenix-1, us-ashburn-1, eu-frankfurt-1, and uk-london-1 have 3 Availability Domains. Selection of availability domain in `oci_core_instance` -> `minecraft_server_test_vm` -> `availability_domain` will default to 0 for AD1 but if you need to override this setting in a multi-AD region, you can do so with the `ad` variable in your `.tfvars` file.
+
+# License
+Copyright (C) 2021 James Pemantell
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Contact
 Author: James Pemantell<br>
